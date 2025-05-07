@@ -29,7 +29,7 @@ const Auth = new mongoose.Schema(
       required: true,
     },
     kecamatan: {
-      type: Boolean,
+      type: String,
       required: true,
     },
     status: {
