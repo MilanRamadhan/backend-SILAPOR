@@ -10,6 +10,14 @@ const Report = new mongoose.Schema(
       type: String,
       required: true,
     },
+    kategori: {
+      type: String,
+      required: true,
+    },
+    address: {
+      type: String,
+      required: true,
+    },
     imageUrl: {
       type: String,
       default: null,

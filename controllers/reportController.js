@@ -1,17 +1,27 @@
 import Report from "../models/Report.js";
 
+const kategoriList = ["Infrastruktur", "Lingkungan", "Kesehatan", "Pendidikan", "Layanan Publik", "Sosial, Lainnya"];
+
 export const createReport = async (req, res) => {
   try {
-    const { title, description, imageUrl, userId } = req.body;
-    if (!title || !description || !imageUrl || !userId) {
+    const { title, description, kategori, address, imageUrl, userId } = req.body;
+    if (!title || !description || !kategori || !address || !imageUrl || !userId) {
       return res.status(400).json({
         status: 400,
         message: "semua kolom harus di isi",
       });
     }
+    if (!kategoriList.includes(kategori)) {
+      return res.status(400).json({
+        status: 400,
+        message: "kategori tidak valid",
+      });
+    }
     const newReport = new Report({
       title,
       description,
+      kategori,
+      address,
       imageUrl,
       userId,
     });
@@ -61,4 +71,9 @@ export const rejectReport = async (req, res) => {
       message: "internal server error",
     });
   }
+};
+
+export const getKategoriList = (req, res) => {
+  const kategoriList = ["Infrastruktur", "Lingkungan", "Kesehatan", "Pendidikan", "Layanan Publik", "Sosial, Lainnya"];
+  res.json({ kategori: kategoriList });
 };
