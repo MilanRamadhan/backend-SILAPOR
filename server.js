@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import cors from "cors";
 import { configDotenv } from "dotenv";
 import authRouter from "./routes/authRouter.js";
+import reportRouter from "./routes/reportRouter.js";
 
 const app = express();
 const port = 3002;
@@ -36,6 +37,7 @@ app.get("/", async (req, res) => {
 });
 
 app.use("/auth", authRouter);
+app.use("/report", reportRouter);
 
 connectDB()
   .then(() => {
