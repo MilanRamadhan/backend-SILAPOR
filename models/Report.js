@@ -42,4 +42,4 @@ const Report = new mongoose.Schema(
   }
 );
 
-export default mongoose.model("Report", ReportSchema);
+export default mongoose.model("Report", Report);
