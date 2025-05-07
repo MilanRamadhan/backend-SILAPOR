@@ -4,8 +4,8 @@ const kategoriList = ["Infrastruktur", "Lingkungan", "Kesehatan", "Pendidikan", 
 
 export const createReport = async (req, res) => {
   try {
-    const { title, description, kategori, address, imageUrl, userId } = req.body;
-    if (!title || !description || !kategori || !address || !imageUrl || !userId) {
+    const { title, description, kategori, address, imageUrl, fullName } = req.body;
+    if (!title || !description || !kategori || !address || !imageUrl || !fullName) {
       return res.status(400).json({
         status: 400,
         message: "semua kolom harus di isi",
@@ -23,13 +23,35 @@ export const createReport = async (req, res) => {
       kategori,
       address,
       imageUrl,
-      userId,
+      fullName,
     });
     await newReport.save();
     return res.status(201).json({
       status: 201,
       data: newReport,
       message: "laporan berhasil dibuat",
+    });
+  } catch (err) {
+    return res.status(500).json({
+      status: 500,
+      message: "internal server error",
+    });
+  }
+};
+
+export const getAllReport = async (req, res) => {
+  try {
+    const reports = await Report.find();
+    if (reports.length === 0) {
+      return res.status(404).json({
+        status: 404,
+        message: "data laporan tidak di temukan atau belum ada",
+      });
+    }
+    return res.status(200).json({
+      status: 200,
+      data: reports,
+      message: "laporan ditemukan",
     });
   } catch (err) {
     return res.status(500).json({
