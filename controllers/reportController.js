@@ -1,4 +1,5 @@
 import Report from "../models/Report.js";
+import { verifyToken } from "../middleware/auth.js";
 
 const kategoriList = ["Infrastruktur", "Lingkungan", "Kesehatan", "Pendidikan", "Layanan Publik", "Sosial, Lainnya"];
 
@@ -102,6 +103,45 @@ export const rejectReport = [
       return res.status(500).json({
         status: 500,
         message: "internal server error",
+      });
+    }
+  },
+];
+
+// GET BY REPORTER ID
+export const getByReporterID = [
+  verifyToken,
+  async (req, res) => {
+    try {
+      const { reporterID } = req.params;
+
+      // Validasi input
+      if (!reporterID) {
+        return res.status(400).json({
+          status: 400,
+          message: "ID Pelapor diperlukan.",
+        });
+      }
+
+      // Mencari laporan berdasarkan reporterID
+      const reports = await Reports.find({ reporterID });
+
+      if (reports.length === 0) {
+        return res.status(404).json({
+          status: 404,
+          message: "Tidak ada laporan yang ditemukan untuk ID Pelapor tersebut.",
+        });
+      }
+
+      res.status(200).json({
+        status: 200,
+        data: reports,
+        message: "Laporan ditemukan",
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: 500,
+        message: error.message,
       });
     }
   },
