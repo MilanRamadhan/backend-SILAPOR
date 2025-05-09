@@ -19,7 +19,7 @@ const Report = new mongoose.Schema(
       required: true,
     },
     imageUrl: {
-      type: String,
+      type: [String],
       default: null,
       required: true,
     },
