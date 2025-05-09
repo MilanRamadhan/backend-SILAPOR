@@ -1,14 +1,20 @@
 import Report from "../models/Report.js";
 import { verifyToken } from "../middleware/auth.js";
+import multer from "multer";
+import { storage } from "../cloudinaryConfig.js";
 
 const kategoriList = ["Infrastruktur", "Lingkungan", "Kesehatan", "Pendidikan", "Layanan Publik", "Sosial, Lainnya"];
+const upload = multer({ storage });
 
 export const createReport = [
   verifyToken,
+  upload.array("images", 10),
   async (req, res) => {
     try {
-      const { title, description, kategori, address, imageUrl, fullName } = req.body;
-      if (!title || !description || !kategori || !address || !imageUrl || !fullName) {
+      const { title, description, kategori, address, fullName } = req.body;
+      const imageUrls = req.files.map((file) => file.path);
+
+      if (!title || !description || !kategori || !address || !imageUrls || !fullName) {
         return res.status(400).json({
           status: 400,
           message: "semua kolom harus di isi",
@@ -25,7 +31,7 @@ export const createReport = [
         description,
         kategori,
         address,
-        imageUrl,
+        imageUrl: imageUrls,
         fullName,
       });
       await newReport.save();
