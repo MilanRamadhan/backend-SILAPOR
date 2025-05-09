@@ -1,23 +1,19 @@
 import jwt from "jsonwebtoken";
 
-export const verifyToken = async (req, res, next) => {
-  const token = req.headers.authorization?.split(" ")[1];
+export const verifyToken = (req, res, next) => {
+  const authHeader = req.headers.authorization;
 
-  if (!token) {
-    return res.status(401).json({
-      status: 401,
-      message: "Akses ditolak, Token tidak tersedia",
-    });
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ message: "Token tidak ditemukan atau format salah" });
   }
+
+  const token = authHeader.split(" ")[1];
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // Simpan data user yang terverifikasi
+    req.user = decoded;
     next();
-  } catch (error) {
-    res.status(403).json({
-      status: 403,
-      message: "token tidak valid",
-    });
+  } catch (err) {
+    return res.status(401).json({ message: "Token tidak valid atau sudah kedaluwarsa" });
   }
 };
