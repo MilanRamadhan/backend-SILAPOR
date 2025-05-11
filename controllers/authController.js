@@ -380,6 +380,31 @@ export const getProfile = [
   },
 ];
 
+export const getAllReport = [
+  verifyToken,
+  async (req, res) => {
+    try {
+      const reports = await Report.find();
+      if (reports.length === 0) {
+        return res.status(404).json({
+          status: 404,
+          message: "data laporan tidak di temukan atau belum ada",
+        });
+      }
+      return res.status(200).json({
+        status: 200,
+        data: reports,
+        message: "laporan ditemukan",
+      });
+    } catch (err) {
+      return res.status(500).json({
+        status: 500,
+        message: "internal server error",
+      });
+    }
+  },
+];
+
 export const getReport = [
   verifyToken,
   async (req, res) => {

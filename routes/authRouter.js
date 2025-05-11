@@ -1,5 +1,5 @@
 import express, { Router } from "express";
-import { register, login, updateUser, updatePassword, getProfile, changeProfilePhoto, deleteUserById, getAllUsers, logout, getReport } from "../controllers/authController.js";
+import { register, login, updateUser, updatePassword, getProfile, changeProfilePhoto, deleteUserById, getAllUsers, logout, getReport, getAllReport } from "../controllers/authController.js";
 
 const authRouter = express.Router();
 authRouter.post("/register", register);
@@ -12,5 +12,6 @@ authRouter.get("/getAllUsers", getAllUsers);
 authRouter.put("/changeProfilePhoto", changeProfilePhoto);
 authRouter.delete("/deleteUserById/:userId", deleteUserById);
 authRouter.get("/getReport", getReport);
+authRouter.get("/getAllReport", getAllReport);
 
 export default authRouter;

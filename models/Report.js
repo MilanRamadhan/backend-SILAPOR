@@ -36,10 +36,10 @@ const Report = new mongoose.Schema(
       type: String,
       default: null,
     },
-    reporterID: {
+    getAllReport: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Auth",
-      required: true,
+      ref: "Report",
+      default: null,
     },
   },
   {

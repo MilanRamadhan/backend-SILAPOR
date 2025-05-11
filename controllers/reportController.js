@@ -115,35 +115,6 @@ export const rejectReport = [
   },
 ];
 
-export const getMyReports = [
-  verifyToken,
-  async (req, res) => {
-    try {
-      const reporterID = req.user._id; // Ambil dari token login
-
-      const reports = await Report.find({ reporterID });
-
-      if (reports.length === 0) {
-        return res.status(404).json({
-          status: 404,
-          message: "Kamu belum membuat laporan apa pun.",
-        });
-      }
-
-      res.status(200).json({
-        status: 200,
-        data: reports,
-        message: "Laporan kamu ditemukan.",
-      });
-    } catch (error) {
-      res.status(500).json({
-        status: 500,
-        message: error.message,
-      });
-    }
-  },
-];
-
 export const getKategoriList = (req, res) => {
   const kategoriList = ["Infrastruktur", "Lingkungan", "Kesehatan", "Pendidikan", "Layanan Publik", "Sosial, Lainnya"];
   res.json({ kategori: kategoriList });
