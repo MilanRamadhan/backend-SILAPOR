@@ -131,7 +131,7 @@ export const updateUser = [
         });
       }
 
-      const editedUser = await Auth.findById(_id ? req.user._id : _id);
+      const editedUser = await Auth.findById(_id || req.user._id);
 
       if (!editedUser) {
         return res.status(404).json({
@@ -183,7 +183,7 @@ export const updatePassword = [
         });
       }
 
-      const user = await Auth.findById(req.user.userId);
+      const user = await Auth.findById(req.user._id);
 
       if (!user) {
         return res.status(404).json({
@@ -242,7 +242,7 @@ export const changeProfilePhoto = [
         });
       }
 
-      const user = await Auth.findById(req.user.userId);
+      const user = await Auth.findById(req.user._id);
 
       if (!user) {
         return res.status(404).json({

@@ -28,10 +28,6 @@ const Report = new mongoose.Schema(
       enum: ["pending", "approved", "rejected"],
       default: "pending",
     },
-    fullName: {
-      type: String,
-      required: true,
-    },
     response: {
       type: String,
       default: null,
