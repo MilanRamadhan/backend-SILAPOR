@@ -41,6 +41,8 @@ export const register = async (req, res) => {
         fullName,
         nomorInduk,
         email,
+        password,
+        confirmPassword,
         callNumber,
         address,
         kecamatan,
