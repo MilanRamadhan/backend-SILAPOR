@@ -11,13 +11,14 @@ export const verifyToken = async (req, res, next) => {
   const token = authHeader.split(" ")[1];
 
   try {
-    // Ambil user berdasarkan ID dari token
-    const user = await Auth.findById(decoded.id);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET); // <-- Hati-hati di sini!
+    const user = await Auth.findById(decoded.id); // <-- decoded.id, bukan userId
+
     if (!user) {
       return res.status(401).json({ message: "User tidak ditemukan" });
     }
 
-    req.user = user; // user lengkap dimasukkan ke req.user
+    req.user = user;
     next();
   } catch (err) {
     return res.status(401).json({ message: "Token tidak valid atau sudah kedaluwarsa" });
