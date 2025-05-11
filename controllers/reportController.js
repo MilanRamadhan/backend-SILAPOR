@@ -33,6 +33,7 @@ export const createReport = [
         address,
         imageUrl: imageUrls,
         fullName,
+        reporterID: req.user._id,
       });
       await newReport.save();
       return res.status(201).json({
@@ -114,35 +115,25 @@ export const rejectReport = [
   },
 ];
 
-// GET BY REPORTER ID
-export const getByReporterID = [
+export const getMyReports = [
   verifyToken,
   async (req, res) => {
     try {
-      const { reporterID } = req.params;
+      const reporterID = req.user._id; // Ambil dari token login
 
-      // Validasi input
-      if (!reporterID) {
-        return res.status(400).json({
-          status: 400,
-          message: "ID Pelapor diperlukan.",
-        });
-      }
-
-      // Mencari laporan berdasarkan reporterID
-      const reports = await Reports.find({ reporterID });
+      const reports = await Report.find({ reporterID });
 
       if (reports.length === 0) {
         return res.status(404).json({
           status: 404,
-          message: "Tidak ada laporan yang ditemukan untuk ID Pelapor tersebut.",
+          message: "Kamu belum membuat laporan apa pun.",
         });
       }
 
       res.status(200).json({
         status: 200,
         data: reports,
-        message: "Laporan ditemukan",
+        message: "Laporan kamu ditemukan.",
       });
     } catch (error) {
       res.status(500).json({

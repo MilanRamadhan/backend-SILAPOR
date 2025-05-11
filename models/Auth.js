@@ -43,6 +43,11 @@ const Auth = new mongoose.Schema(
       type: String,
       default: null,
     },
+    getReport: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Report",
+      default: null,
+    },
   },
   {
     timestamps: true,

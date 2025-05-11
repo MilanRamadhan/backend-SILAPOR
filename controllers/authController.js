@@ -30,34 +30,34 @@ export const register = async (req, res) => {
       });
     }
 
-    const alreadyRegister = await Auth.findOne({ email: email });
+    const alreadyRegister = await Auth.findOne({ email });
     if (alreadyRegister) {
       return res.status(400).json({
         status: 400,
         message: "akun dengan email ini sudah terdaftar, silahkan gunakan email lain",
       });
+    } else {
+      const newUser = new Auth({
+        fullName,
+        nomorInduk,
+        email,
+        callNumber,
+        address,
+        kecamatan,
+        role,
+      });
+
+      bcryptjs.hash(password, 10, async (err, hash) => {
+        if (err) {
+          return res.status(500).json(err);
+        }
+
+        newUser.set("password", hash);
+        await newUser.save(); // Tunggu sampai user disimpan ke DB
+
+        return res.status(200).json({ data: newUser, message: "Pengguna berhasil terdaftar." });
+      });
     }
-
-    const newUser = new Auth({
-      fullName,
-      nomorInduk,
-      email,
-      callNumber,
-      address,
-      kecamatan,
-      role,
-    });
-
-    bcryptjs.hash(password, 10, async (err, hash) => {
-      if (err) {
-        return res.status(500).json(err);
-      }
-
-      newUser.set("password", hash);
-      await newUser.save(); // Tunggu sampai user disimpan ke DB
-
-      return res.status(200).json({ data: newUser, message: "Pengguna berhasil terdaftar." });
-    });
   } catch (error) {
     return res.status(500).json({
       status: 500,
@@ -373,6 +373,33 @@ export const getProfile = [
       });
     } catch (error) {
       res.status(500).json({
+        status: 500,
+        message: "Internal Server Error",
+      });
+    }
+  },
+];
+
+export const getReport = [
+  verifyToken,
+  async (req, res) => {
+    try {
+      const report = await Auth.findById(req.user.userId);
+
+      if (!report) {
+        return res.status(404).json({
+          status: 404,
+          message: "Report tidak ditemukan",
+        });
+      }
+
+      return res.status(200).json({
+        status: 200,
+        data: report,
+        message: "Report ditemukan",
+      });
+    } catch (error) {
+      return res.status(500).json({
         status: 500,
         message: "Internal Server Error",
       });
