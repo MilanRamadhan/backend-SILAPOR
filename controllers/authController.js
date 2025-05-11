@@ -384,7 +384,7 @@ export const getReport = [
   verifyToken,
   async (req, res) => {
     try {
-      const report = await Auth.findById(req.user.userId);
+      const report = await Auth.findById(req.user._id);
 
       if (!report) {
         return res.status(404).json({
