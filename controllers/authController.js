@@ -122,7 +122,7 @@ export const updateUser = [
 
       const { _id } = req.params;
 
-      if (!firstName || !email) {
+      if (!fullName || !email) {
         return res.status(400).json({
           status: 400,
           message: "kolom first name ataupun kolom email tidak boleh kosong",
