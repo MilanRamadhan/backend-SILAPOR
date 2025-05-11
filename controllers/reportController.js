@@ -36,9 +36,6 @@ export const createReport = [
         reporterID: req.user._id,
       });
       await newReport.save();
-      await Auth.findByIdAndUpdate(req.user._id, {
-        $push: { getReport: newReport._id },
-      });
       return res.status(201).json({
         status: 201,
         data: newReport,
