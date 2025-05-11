@@ -84,7 +84,7 @@ export const login = async (req, res) => {
           res.status(400).json({ status: 400, message: "Email atau kata sandi salah." });
         } else {
           const payload = {
-            userId: user._id,
+            id: user._id,
             email: user.email,
           };
           const JWT_SECRET = process.env.JWT_SECRET;
