@@ -115,6 +115,30 @@ export const rejectReport = [
   },
 ];
 
+export const getMyReports = async (req, res) => {
+  try {
+    const userId = req.user.id; // diasumsikan user sudah login dan token sudah diparsing
+    const reports = await Report.find({ reporterID: userId });
+    res.status(200).json(reports);
+  } catch (err) {
+    res.status(500).json({ message: "Gagal mengambil laporan user", error: err.message });
+  }
+};
+
+export const getAllReports = async (req, res) => {
+  try {
+    // validasi apakah dia admin
+    if (!req.user.role) {
+      return res.status(403).json({ message: "Akses ditolak. Bukan admin." });
+    }
+
+    const reports = await Report.find().populate("reporterID", "fullName email nomorInduk");
+    res.status(200).json(reports);
+  } catch (err) {
+    res.status(500).json({ message: "Gagal mengambil semua laporan", error: err.message });
+  }
+};
+
 export const getReportById = [
   verifyToken,
   async (req, res) => {

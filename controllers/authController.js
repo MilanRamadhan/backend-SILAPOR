@@ -380,58 +380,6 @@ export const getProfile = [
   },
 ];
 
-export const getAllReport = [
-  verifyToken,
-  async (req, res) => {
-    try {
-      const reports = await Report.find();
-      if (reports.length === 0) {
-        return res.status(404).json({
-          status: 404,
-          message: "data laporan tidak di temukan atau belum ada",
-        });
-      }
-      return res.status(200).json({
-        status: 200,
-        data: reports,
-        message: "laporan ditemukan",
-      });
-    } catch (err) {
-      return res.status(500).json({
-        status: 500,
-        message: "internal server error",
-      });
-    }
-  },
-];
-
-export const getMyReports = [
-  verifyToken,
-  async (req, res) => {
-    try {
-      const user = await Auth.findById(req.user._id).populate("getReport");
-
-      if (!user) {
-        return res.status(404).json({
-          status: 404,
-          message: "User tidak ditemukan",
-        });
-      }
-
-      return res.status(200).json({
-        status: 200,
-        data: user.getReport,
-        message: "Laporan milik user ditemukan",
-      });
-    } catch (error) {
-      return res.status(500).json({
-        status: 500,
-        message: "Internal Server Error",
-      });
-    }
-  },
-];
-
 export const getKecamatanList = (req, res) => {
   const kecamatanList = ["Baiturrahman", "Banda Raya", "Jaya Baru", "Kuta Alam", "Kuta Raja", "Lueng Bata", "Meuraxa", "Syiah Kuala", "Ulee Kareng"];
   res.json({ kecamatan: kecamatanList });
