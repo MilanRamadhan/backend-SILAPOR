@@ -11,10 +11,10 @@ export const createReport = [
   upload.array("images", 10),
   async (req, res) => {
     try {
-      const { title, description, kategori, address, fullName } = req.body;
+      const { title, description, kategori, address } = req.body;
       const imageUrls = req.files.map((file) => file.path);
 
-      if (!title || !description || !kategori || !address || !imageUrls || !fullName) {
+      if (!title || !description || !kategori || !address || !imageUrls) {
         return res.status(400).json({
           status: 400,
           message: "semua kolom harus di isi",
@@ -32,7 +32,6 @@ export const createReport = [
         kategori,
         address,
         imageUrl: imageUrls,
-        fullName,
         reporterID: req.user._id,
       });
       await newReport.save();
