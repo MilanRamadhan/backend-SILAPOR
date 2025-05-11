@@ -46,12 +46,10 @@ const Auth = new mongoose.Schema(
     getReport: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Report",
-      default: null,
     },
     getAllReport: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Report",
-      default: null,
     },
   },
   {
