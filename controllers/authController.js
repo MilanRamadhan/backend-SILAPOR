@@ -120,7 +120,7 @@ export const updateUser = [
     try {
       const { fullName, nomorInduk, email, callNumber, address, kecamatan, status, role } = req.body;
 
-      const { userId } = req.params;
+      const { _id } = req.params;
 
       if (!firstName || !email) {
         return res.status(400).json({
@@ -129,7 +129,7 @@ export const updateUser = [
         });
       }
 
-      const editedUser = await Auth.findById(!userId ? req.user.userId : userId);
+      const editedUser = await Auth.findById(_id ? req.user._id : _id);
 
       if (!editedUser) {
         return res.status(404).json({
@@ -299,16 +299,16 @@ export const deleteUserById = [
   verifyToken,
   async (req, res) => {
     try {
-      const { userId } = req.params;
+      const { _id } = req.params;
 
-      if (!userId) {
+      if (!_id) {
         return res.status(400).json({
           status: 400,
           message: "User ID diperlukan, tetapi tidak disediakan",
         });
       }
 
-      const deletedUser = await Auth.findByIdAndDelete(userId);
+      const deletedUser = await Auth.findByIdAndDelete(_id);
 
       return res.status(200).json({
         status: 200,
@@ -328,16 +328,16 @@ export const logout = [
   verifyToken,
   async (req, res) => {
     try {
-      const { userId } = req.user; // Assuming userId is sent from the client during logout
+      const { _id } = req.user; // Assuming userId is sent from the client during logout
 
-      if (!userId) {
+      if (!_id) {
         return res.status(400).json({
           status: 400,
           message: "ID Pengguna diperlukan untuk keluar.",
         });
       }
 
-      const user = await Auth.findById(userId);
+      const user = await Auth.findById(_id);
       if (!user) {
         return res.status(404).json({ status: 404, message: "Pengguna tidak ditemukan." });
       }
@@ -357,7 +357,7 @@ export const getProfile = [
   verifyToken,
   async (req, res) => {
     try {
-      const user = await Auth.findById(req.user.userId);
+      const user = await Auth.findById(req.user._id);
 
       if (!user) {
         return res.status(400).json({
