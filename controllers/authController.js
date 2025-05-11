@@ -405,24 +405,23 @@ export const getAllReport = [
   },
 ];
 
-export const getReport = [
+export const getMyReports = [
   verifyToken,
   async (req, res) => {
     try {
-      const { _id } = req.params;
+      const user = await Auth.findById(req.user._id).populate("getReport");
 
-      const report = await Report.findById(_id);
-      if (!report) {
+      if (!user) {
         return res.status(404).json({
           status: 404,
-          message: "Report tidak ditemukan",
+          message: "User tidak ditemukan",
         });
       }
 
       return res.status(200).json({
         status: 200,
-        data: report,
-        message: "Report ditemukan",
+        data: user.getReport,
+        message: "Laporan milik user ditemukan",
       });
     } catch (error) {
       return res.status(500).json({

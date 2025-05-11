@@ -36,11 +36,6 @@ const Report = new mongoose.Schema(
       type: String,
       default: null,
     },
-    getAllReport: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Report",
-      default: null,
-    },
   },
   {
     timestamps: true,

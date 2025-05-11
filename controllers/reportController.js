@@ -115,6 +115,25 @@ export const rejectReport = [
   },
 ];
 
+export const getReportById = [
+  verifyToken,
+  async (req, res) => {
+    try {
+      const { reportId } = req.params;
+
+      const report = await Report.findById(reportId);
+      if (!report) return res.status(404).json({ message: "Laporan tidak ditemukan" });
+
+      res.json({ message: "Laporan ditemukan", report });
+    } catch (err) {
+      return res.status(500).json({
+        status: 500,
+        message: "internal server error",
+      });
+    }
+  },
+];
+
 export const getKategoriList = (req, res) => {
   const kategoriList = ["Infrastruktur", "Lingkungan", "Kesehatan", "Pendidikan", "Layanan Publik", "Sosial, Lainnya"];
   res.json({ kategori: kategoriList });
