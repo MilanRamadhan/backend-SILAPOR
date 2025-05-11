@@ -116,7 +116,7 @@ export const rejectReport = [
 
 export const getMyReports = async (req, res) => {
   try {
-    const userId = req.user.id; // diasumsikan user sudah login dan token sudah diparsing
+    const userId = req.user._id; // diasumsikan user sudah login dan token sudah diparsing
     const reports = await Report.find({ reporterID: userId });
     res.status(200).json(reports);
   } catch (err) {
