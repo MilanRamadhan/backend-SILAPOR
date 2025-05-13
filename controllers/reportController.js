@@ -11,10 +11,10 @@ export const createReport = [
   upload.array("images", 10),
   async (req, res) => {
     try {
-      const { title, description, kategori, address } = req.body;
+      const { reporterID, title, description, kategori, address } = req.body;
       const imageUrls = req.files.map((file) => file.path);
 
-      if (!title || !description || !kategori || !address || !imageUrls) {
+      if (!reporterID || !title || !description || !kategori || !address || !imageUrls) {
         return res.status(400).json({
           status: 400,
           message: "semua kolom harus di isi",
@@ -26,18 +26,12 @@ export const createReport = [
           message: "kategori tidak valid",
         });
       }
-      const newReport = new Report({
-        title,
-        description,
-        kategori,
-        address,
-        imageUrl: imageUrls,
-        reporterID: req.user._id,
-      });
-      await newReport.save();
+      const newReport = new Reports(req.body);
+      const savedReport = await newReport.save();
+
       return res.status(201).json({
         status: 201,
-        data: newReport,
+        data: savedReport,
         message: "laporan berhasil dibuat",
       });
     } catch (err) {
@@ -49,11 +43,11 @@ export const createReport = [
   },
 ];
 
-export const getAllReport = [
+export const getAllReports = [
   verifyToken,
   async (req, res) => {
     try {
-      const reports = await Report.find();
+      const reports = await Reports.find();
       if (reports.length === 0) {
         return res.status(404).json({
           status: 404,
@@ -74,14 +68,91 @@ export const getAllReport = [
   },
 ];
 
+export const editReport = [
+  verifyToken,
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      // Validasi ID
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({
+          status: 400,
+          message: "ID laporan tidak valid.",
+        });
+      }
+
+      const updatedReport = await Reports.findByIdAndUpdate(id, req.body, {
+        new: true,
+        runValidators: true,
+      });
+
+      if (!updatedReport) {
+        return res.status(404).json({
+          status: 404,
+          message: "Laporan tidak ditemukan.",
+        });
+      }
+
+      res.status(200).json({
+        status: 200,
+        data: updatedReport,
+        message: "Laporan berhasil diperbarui",
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: 500,
+        message: error.message,
+      });
+    }
+  },
+];
+
+// DELETE REPORT
+export const deleteReport = [
+  verifyToken,
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      // Validasi ID
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({
+          status: 400,
+          message: "ID laporan tidak valid.",
+        });
+      }
+
+      const deletedReport = await Reports.findByIdAndDelete(id);
+      if (!deletedReport) {
+        return res.status(404).json({
+          status: 404,
+          message: "Laporan tidak ditemukan.",
+        });
+      }
+
+      res.status(200).json({
+        status: 200,
+        data: deletedReport,
+        message: "Laporan berhasil dihapus.",
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: 500,
+        message: error.message,
+      });
+    }
+  },
+];
+
 export const approveReport = [
   verifyToken,
   async (req, res) => {
     try {
-      const { reportId } = req.params;
+      const { reporterID } = req.params;
       const { response } = req.body;
 
-      const report = await Report.findByIdAndUpdate(reportId, { status: "approved", response }, { new: true });
+      const report = await Report.findByIdAndUpdate(reporterID, { status: "approved", response }, { new: true });
       if (!report) return res.status(404).json({ message: "Laporan tidak ditemukan" });
 
       res.json({ message: "Laporan disetujui", report });
@@ -98,10 +169,10 @@ export const rejectReport = [
   verifyToken,
   async (req, res) => {
     try {
-      const { reportId } = req.params;
+      const { reporterID } = req.params;
       const { response } = req.body;
 
-      const report = await Report.findByIdAndUpdate(reportId, { status: "rejected", response }, { new: true });
+      const report = await Report.findByIdAndUpdate(reporterID, { status: "rejected", response }, { new: true });
       if (!report) return res.status(404).json({ message: "Laporan tidak ditemukan" });
 
       res.json({ message: "Laporan ditolak", report });
@@ -114,44 +185,155 @@ export const rejectReport = [
   },
 ];
 
-export const getMyReports = async (req, res) => {
-  try {
-    const userId = req.user._id; // diasumsikan user sudah login dan token sudah diparsing
-    const reports = await Report.find({ reporterID: userId });
-    res.status(200).json(reports);
-  } catch (err) {
-    res.status(500).json({ message: "Gagal mengambil laporan user", error: err.message });
-  }
-};
-
-export const getAllReports = async (req, res) => {
-  try {
-    // validasi apakah dia admin
-    if (!req.user.role) {
-      return res.status(403).json({ message: "Akses ditolak. Bukan admin." });
-    }
-
-    const reports = await Report.find().populate("reporterID", "fullName email nomorInduk");
-    res.status(200).json(reports);
-  } catch (err) {
-    res.status(500).json({ message: "Gagal mengambil semua laporan", error: err.message });
-  }
-};
-
-export const getReportById = [
+export const getByReporterID = [
   verifyToken,
   async (req, res) => {
     try {
-      const { reportId } = req.params;
+      const { reporterID } = req.params;
 
-      const report = await Report.findById(reportId);
-      if (!report) return res.status(404).json({ message: "Laporan tidak ditemukan" });
+      // Validasi input
+      if (!reporterID) {
+        return res.status(400).json({
+          status: 400,
+          message: "ID Pelapor diperlukan.",
+        });
+      }
 
-      res.json({ message: "Laporan ditemukan", report });
-    } catch (err) {
+      // Mencari laporan berdasarkan reporterID
+      const reports = await Reports.find({ reporterID });
+
+      if (reports.length === 0) {
+        return res.status(404).json({
+          status: 404,
+          message: "Tidak ada laporan yang ditemukan untuk ID Pelapor tersebut.",
+        });
+      }
+
+      res.status(200).json({
+        status: 200,
+        data: reports,
+        message: "Laporan ditemukan",
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: 500,
+        message: error.message,
+      });
+    }
+  },
+];
+
+export const getReportsByUserId = [
+  verifyToken,
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      if (!id) {
+        return res.status(400).json({
+          status: 400,
+          message: "ID Pengguna diperlukan, tetapi tidak disediakan",
+        });
+      }
+
+      const reports = await Report.aggregate([
+        {
+          $match: { reporterID: new mongoose.Types.ObjectId(id) },
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "reporterID",
+            foreignField: "_id",
+            as: "user",
+          },
+        },
+        { $unwind: "$user" },
+        {
+          $project: {
+            title: 1,
+            description: 1,
+            category: 1,
+            status: 1,
+            createdAt: 1,
+            user: {
+              _id: "$user._id",
+              name: "$user.name",
+              email: "$user.email",
+            },
+          },
+        },
+      ]);
+
+      if (!reports.length) {
+        return res.status(404).json({
+          status: 404,
+          message: "Tidak ada laporan ditemukan untuk pengguna ini",
+        });
+      }
+
+      return res.status(200).json({
+        status: 200,
+        message: "Berhasil mengambil laporan pengguna",
+        data: reports,
+      });
+    } catch (error) {
+      console.error("Error in getReportsByUserId:", error);
       return res.status(500).json({
         status: 500,
-        message: "internal server error",
+        message: "Kesalahan server internal",
+      });
+    }
+  },
+];
+
+export const getOtherUsersReports = [
+  verifyToken,
+  async (req, res) => {
+    try {
+      const loggedInUserId = req.user.id;
+
+      const reports = await Report.aggregate([
+        {
+          $match: {
+            reporterID: { $ne: new mongoose.Types.ObjectId(loggedInUserId) },
+          },
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "reporterID",
+            foreignField: "_id",
+            as: "user",
+          },
+        },
+        { $unwind: "$user" },
+        {
+          $project: {
+            title: 1,
+            description: 1,
+            category: 1,
+            status: 1,
+            createdAt: 1,
+            user: {
+              _id: "$user._id",
+              name: "$user.name",
+              email: "$user.email",
+            },
+          },
+        },
+      ]);
+
+      return res.status(200).json({
+        status: 200,
+        message: "Berhasil mengambil laporan dari pengguna lain",
+        data: reports,
+      });
+    } catch (error) {
+      console.error("Error in getOtherUsersReports:", error);
+      return res.status(500).json({
+        status: 500,
+        message: "Kesalahan server internal",
       });
     }
   },

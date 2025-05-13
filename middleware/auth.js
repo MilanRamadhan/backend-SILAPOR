@@ -1,26 +1,23 @@
 import jwt from "jsonwebtoken";
-import Auth from "../models/Auth.js";
 
-export const verifyToken = async (req, res, next) => {
-  const authHeader = req.headers.authorization;
+export const verifyToken = (req, res, next) => {
+  const token = req.headers.authorization?.split(" ")[1];
 
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ message: "Token tidak ditemukan atau format salah" });
+  if (!token) {
+    return res.status(401).json({
+      status: 401,
+      message: "Access denied. No token provided.",
+    });
   }
 
-  const token = authHeader.split(" ")[1];
-
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET); // <-- Hati-hati di sini!
-    const user = await Auth.findById(decoded.id); // <-- decoded.id, bukan userId
-
-    if (!user) {
-      return res.status(401).json({ message: "User tidak ditemukan" });
-    }
-
-    req.user = user;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded; // Simpan payload ke dalam `req.user` untuk digunakan di fungsi lain
     next();
-  } catch (err) {
-    return res.status(401).json({ message: "Token tidak valid atau sudah kedaluwarsa" });
+  } catch (error) {
+    res.status(403).json({
+      status: 403,
+      message: "Invalid or expired token.",
+    });
   }
 };

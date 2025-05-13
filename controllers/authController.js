@@ -120,40 +120,59 @@ export const updateUser = [
   verifyToken,
   async (req, res) => {
     try {
-      const { fullName, nomorInduk, email, callNumber, address, kecamatan, status, role } = req.body;
+      const { id } = req.params;
+      const { newFullName, newNomorInduk, newEmail, newCallNumber, newAddress, newPassword } = req.body;
 
-      const { _id } = req.params;
+      if (!id) {
+        return res.status(400).json({
+          status: 400,
+          message: "ID Pengguna diperlukan, tetapi tidak disediakan",
+        });
+      }
 
-      if (!fullName || !email) {
+      if (!newFullName || !newEmail) {
         return res.status(400).json({
           status: 400,
           message: "kolom first name ataupun kolom email tidak boleh kosong",
         });
       }
 
-      const editedUser = await Auth.findById(_id || req.user._id);
+      const emailAlreadyRegistered = await Auth.findOne({
+        email: newEmail,
+      });
+      const nameAlreadyRegistered = await Auth.findOne({
+        fullName: newFullName,
+      });
 
-      if (!editedUser) {
-        return res.status(404).json({
-          status: 404,
-          message: "user tidak ditemukan",
+      if (emailAlreadyRegistered) {
+        return res.status(400).json({
+          status: 400,
+          message: "Email sudah digunakan",
         });
       }
 
-      editedUser.fullName = fullName;
-      editedUser.nomorInduk = nomorInduk;
-      editedUser.email = email;
-      editedUser.callNumber = callNumber ?? editedUser.callNumber;
-      editedUser.address = address ?? editedUser.address;
-      editedUser.kecamatan = kecamatan;
-
-      if (status !== undefined) {
-        editedUser.set("status", status);
+      if (nameAlreadyRegistered) {
+        return res.status(400).json({
+          status: 400,
+          message: "Nama sudah digunakan",
+        });
       }
 
-      if (role !== undefined) {
-        editedUser.set("role", role);
+      const editedUser = await Auth.findById(id);
+
+      if (!editedUser) {
+        return res.status(400).json({
+          status: 400,
+          message: "pengguna tidak ditemukan",
+        });
       }
+
+      editedUser.fullName = newFullName;
+      editedUser.nomorInduk = newNomorInduk;
+      editedUser.email = newEmail;
+      editedUser.callNumber = newCallNumber ?? editedUser.callNumber;
+      editedUser.address = newAddress ?? editedUser.address;
+      editedUser.password = newPassword ?? editedUser.password;
 
       await editedUser.save();
 
@@ -175,35 +194,28 @@ export const updatePassword = [
   verifyToken,
   async (req, res) => {
     try {
-      const { currentPassword, newPassword, confirmNewPassword } = req.body;
-      if (!currentPassword || !newPassword || !confirmNewPassword) {
-        res.status(400).json({
+      const { id } = req.params;
+      const { newPassword } = req.body;
+      if (!id) {
+        return res.status(400).json({
           status: 400,
-          message: "semua kolom harus diisi",
+          message: "ID Pengguna diperlukan, tetapi tidak disediakan",
         });
       }
 
-      const user = await Auth.findById(req.user._id);
+      if (!newPassword) {
+        return res.status(400).json({
+          status: 400,
+          message: "Kata sandi baru diperlukan, tetapi tidak disediakan",
+        });
+      }
+
+      const user = await Auth.findById(id);
 
       if (!user) {
         return res.status(404).json({
           status: 404,
-          message: "User tidak ditemukan",
-        });
-      }
-
-      const validateUser = await bcryptjs.compare(currentPassword, user.password);
-      if (!validateUser) {
-        return res.status(400).json({
-          status: 400,
-          message: "password anda salah",
-        });
-      }
-
-      if (newPassword !== confirmNewPassword) {
-        return res.status(400).json({
-          status: 400,
-          message: "password baru anda tidak sama dengan kolom konfirmasi password",
+          message: "Pengguna Tidak Ditemukan",
         });
       }
 
@@ -242,7 +254,7 @@ export const changeProfilePhoto = [
         });
       }
 
-      const user = await Auth.findById(req.user._id);
+      const user = await Auth.findById(req.user.userId);
 
       if (!user) {
         return res.status(404).json({
@@ -297,90 +309,31 @@ export const getAllUsers = [
   },
 ];
 
-export const deleteUserById = [
-  verifyToken,
-  async (req, res) => {
-    try {
-      const { _id } = req.params;
+export const logout = async (req, res) => {
+  try {
+    const { userId } = req.body; // Assuming userId is sent from the client during logout
 
-      if (!_id) {
-        return res.status(400).json({
-          status: 400,
-          message: "User ID diperlukan, tetapi tidak disediakan",
-        });
-      }
-
-      const deletedUser = await Auth.findByIdAndDelete(_id);
-
-      return res.status(200).json({
-        status: 200,
-        data: deletedUser,
-        message: "User berhasil dihapus",
-      });
-    } catch (error) {
-      return res.status(500).json({
-        status: 500,
-        message: "Internal Server Error",
+    if (!userId) {
+      return res.status(400).json({
+        status: 400,
+        message: "ID Pengguna diperlukan untuk keluar.",
       });
     }
-  },
-];
 
-export const logout = [
-  verifyToken,
-  async (req, res) => {
-    try {
-      const { _id } = req.user; // Assuming userId is sent from the client during logout
-
-      if (!_id) {
-        return res.status(400).json({
-          status: 400,
-          message: "ID Pengguna diperlukan untuk keluar.",
-        });
-      }
-
-      const user = await Auth.findById(_id);
-      if (!user) {
-        return res.status(404).json({ status: 404, message: "Pengguna tidak ditemukan." });
-      }
-
-      // Remove or set token to null
-      user.set("token", null);
-      await user.save();
-
-      return res.status(200).json({ status: 200, message: "Pengguna berhasil keluar." });
-    } catch (error) {
-      return res.status(500).json({ status: 500, message: "Terjadi kesalahan saat keluar." });
+    const user = await Auth.findById(userId);
+    if (!user) {
+      return res.status(404).json({ status: 404, message: "Pengguna tidak ditemukan." });
     }
-  },
-];
 
-export const getProfile = [
-  verifyToken,
-  async (req, res) => {
-    try {
-      const user = await Auth.findById(req.user._id);
+    // Remove or set token to null
+    user.set("token", null);
+    await user.save();
 
-      if (!user) {
-        return res.status(400).json({
-          status: 404,
-          message: "User tidak ditemukan",
-        });
-      }
-
-      return res.status(200).json({
-        status: 200,
-        data: user,
-        message: "User ditemukan",
-      });
-    } catch (error) {
-      res.status(500).json({
-        status: 500,
-        message: "Internal Server Error",
-      });
-    }
-  },
-];
+    return res.status(200).json({ status: 200, message: "Pengguna berhasil keluar." });
+  } catch (error) {
+    return res.status(500).json({ status: 500, message: "Terjadi kesalahan saat keluar." });
+  }
+};
 
 export const getKecamatanList = (req, res) => {
   const kecamatanList = ["Baiturrahman", "Banda Raya", "Jaya Baru", "Kuta Alam", "Kuta Raja", "Lueng Bata", "Meuraxa", "Syiah Kuala", "Ulee Kareng"];

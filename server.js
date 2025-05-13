@@ -13,8 +13,6 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use("/auth", authRouter);
-
 const clientOptions = {
   serverApi: { version: "1", strict: true, deprecationErrors: true },
 };

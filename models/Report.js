@@ -1,7 +1,11 @@
 import mongoose from "mongoose";
 
-const Report = new mongoose.Schema(
+const Reports = new mongoose.Schema(
   {
+    reporterID: {
+      type: String,
+      required: true,
+    },
     title: {
       type: String,
       required: true,
@@ -23,18 +27,14 @@ const Report = new mongoose.Schema(
       default: [],
       required: true,
     },
-    status: {
-      type: String,
-      enum: ["pending", "approved", "rejected"],
-      default: "pending",
-    },
     response: {
       type: String,
       default: null,
     },
-    reporterID: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Auth",
+    status: {
+      type: String,
+      required: true,
+      default: "Menunggu konfirmasi",
     },
   },
   {
@@ -42,4 +42,4 @@ const Report = new mongoose.Schema(
   }
 );
 
-export default mongoose.model("Report", Report);
+export default mongoose.model("Report", Reports);
