@@ -26,7 +26,14 @@ export const createReport = [
           message: "kategori tidak valid",
         });
       }
-      const newReport = new Reports(req.body);
+      const newReport = new Reports({
+        reporterID,
+        title,
+        description,
+        kategori,
+        address,
+        images: imageUrls,
+      });
       const savedReport = await newReport.save();
 
       return res.status(201).json({
