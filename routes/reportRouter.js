@@ -9,7 +9,7 @@ router.put("/reject/:reportId", rejectReport);
 router.get("/getAllReports", getAllReports);
 router.get("/getByReporterID/:reporterID", getByReporterID);
 router.get("/getOtherUsersReports", getOtherUsersReports);
-router.get("/getReportsByUserId/:Id", getReportsByUserId);
+router.get("/getReportsByUserId/:id", getReportsByUserId);
 router.put("/editReport/:id", editReport);
 router.delete("/deleteReport/:id", deleteReport);
 
