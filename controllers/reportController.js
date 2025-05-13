@@ -11,6 +11,9 @@ export const createReport = [
   upload.array("images", 10),
   async (req, res) => {
     try {
+      console.log("req.body:", req.body);
+      console.log("req.files:", req.files);
+
       const { reporterID, title, description, kategori, address } = req.body;
       const imageUrls = req.files.map((file) => file.path);
 
@@ -42,9 +45,13 @@ export const createReport = [
         message: "laporan berhasil dibuat",
       });
     } catch (err) {
+      console.error("CREATE REPORT ERROR:", err.message);
+      console.error("STACK TRACE:", err.stack);
+
       return res.status(500).json({
         status: 500,
-        message: "internal server error",
+        message: err.message,
+        stack: err.stack,
       });
     }
   },
