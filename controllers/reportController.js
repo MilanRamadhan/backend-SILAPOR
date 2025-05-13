@@ -256,13 +256,13 @@ export const getReportsByUserId = [
         },
         {
           $lookup: {
-            from: "users",
+            from: "auths",
             localField: "reporterID",
             foreignField: "_id",
-            as: "user",
+            as: "auths",
           },
         },
-        { $unwind: "$user" },
+        { $unwind: "$auths" },
         {
           $project: {
             title: 1,
@@ -270,10 +270,10 @@ export const getReportsByUserId = [
             category: 1,
             status: 1,
             createdAt: 1,
-            user: {
-              _id: "$user._id",
-              name: "$user.name",
-              email: "$user.email",
+            auths: {
+              _id: "$auths._id",
+              name: "$auths.name",
+              email: "$auths.email",
             },
           },
         },
