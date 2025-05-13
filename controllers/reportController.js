@@ -1,4 +1,4 @@
-import Report from "../models/Report.js";
+import Reports from "../models/Report.js";
 import { verifyToken } from "../middleware/auth.js";
 import multer from "multer";
 import { storage } from "../cloudinaryConfig.js";
