@@ -166,7 +166,7 @@ export const approveReport = [
       const { reporterID } = req.params;
       const { response } = req.body;
 
-      const report = await Report.findByIdAndUpdate(reporterID, { status: "approved", response }, { new: true });
+      const report = await Reports.findByIdAndUpdate(reporterID, { status: "approved", response }, { new: true });
       if (!report) return res.status(404).json({ message: "Laporan tidak ditemukan" });
 
       res.json({ message: "Laporan disetujui", report });
@@ -186,7 +186,7 @@ export const rejectReport = [
       const { reporterID } = req.params;
       const { response } = req.body;
 
-      const report = await Report.findByIdAndUpdate(reporterID, { status: "rejected", response }, { new: true });
+      const report = await Reports.findByIdAndUpdate(reporterID, { status: "rejected", response }, { new: true });
       if (!report) return res.status(404).json({ message: "Laporan tidak ditemukan" });
 
       res.json({ message: "Laporan ditolak", report });
@@ -250,7 +250,7 @@ export const getReportsByUserId = [
         });
       }
 
-      const reports = await Report.aggregate([
+      const reports = await Reports.aggregate([
         {
           $match: { reporterID: new mongoose.Types.ObjectId(id) },
         },
@@ -291,8 +291,8 @@ export const getReportsByUserId = [
         message: "Berhasil mengambil laporan pengguna",
         data: reports,
       });
-    } catch (error) {
-      console.error("Error in getReportsByUserId:", error);
+    } catch (err) {
+      console.error("Error in getReportsByUserId:", err.message, err.stack);
       return res.status(500).json({
         status: 500,
         message: "Kesalahan server internal",
@@ -307,7 +307,7 @@ export const getOtherUsersReports = [
     try {
       const loggedInUserId = req.user.id;
 
-      const reports = await Report.aggregate([
+      const reports = await Reports.aggregate([
         {
           $match: {
             reporterID: { $ne: new mongoose.Types.ObjectId(loggedInUserId) },
@@ -315,13 +315,13 @@ export const getOtherUsersReports = [
         },
         {
           $lookup: {
-            from: "users",
+            from: "auths",
             localField: "reporterID",
             foreignField: "_id",
-            as: "user",
+            as: "auths",
           },
         },
-        { $unwind: "$user" },
+        { $unwind: "$auths" },
         {
           $project: {
             title: 1,
@@ -329,10 +329,10 @@ export const getOtherUsersReports = [
             category: 1,
             status: 1,
             createdAt: 1,
-            user: {
-              _id: "$user._id",
-              name: "$user.name",
-              email: "$user.email",
+            auths: {
+              _id: "$auths._id",
+              name: "$auths.name",
+              email: "$auths.email",
             },
           },
         },
@@ -343,8 +343,8 @@ export const getOtherUsersReports = [
         message: "Berhasil mengambil laporan dari pengguna lain",
         data: reports,
       });
-    } catch (error) {
-      console.error("Error in getOtherUsersReports:", error);
+    } catch (err) {
+      console.error("Error in getOtherUsersReports:", err.message, err.stack);
       return res.status(500).json({
         status: 500,
         message: "Kesalahan server internal",
