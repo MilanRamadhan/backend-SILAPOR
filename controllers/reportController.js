@@ -243,47 +243,32 @@ export const getReportsByUserId = [
     try {
       const { id } = req.params;
 
-      if (!id) {
-        return res.status(400).json({
-          status: 400,
-          message: "ID Pengguna diperlukan, tetapi tidak disediakan",
-        });
-      }
+      console.log("📌 PARAMS ID:", id);
+
+      // Validasi ID
       if (!mongoose.Types.ObjectId.isValid(id)) {
         return res.status(400).json({
           status: 400,
-          message: "ID pengguna tidak valid",
+          message: "ID Pengguna tidak valid",
         });
       }
 
-      const reports = await Reports.aggregate([
-        {
-          $match: { reporterID: new mongoose.Types.ObjectId(id) },
-        },
-        {
-          $lookup: {
-            from: "auths",
-            localField: "reporterID",
-            foreignField: "_id",
-            as: "auths",
-          },
-        },
-        { $unwind: "$auths" },
-        {
-          $project: {
-            title: 1,
-            description: 1,
-            category: 1,
-            status: 1,
-            createdAt: 1,
-            auths: {
-              _id: "$auths._id",
-              name: "$auths.name",
-              email: "$auths.email",
-            },
-          },
-        },
-      ]);
+      const objectId = new mongoose.Types.ObjectId(id);
+
+      // Coba cari dulu user-nya
+      const authExist = await mongoose.connection.collection("auths").findOne({ _id: objectId });
+      if (!authExist) {
+        return res.status(404).json({
+          status: 404,
+          message: "User tidak ditemukan di koleksi auths",
+        });
+      }
+
+      console.log("✅ User ditemukan:", authExist.name || authExist.email);
+
+      const reports = await Reports.find({ reporterID: objectId });
+
+      console.log("✅ Jumlah laporan ditemukan:", reports.length);
 
       if (!reports.length) {
         return res.status(404).json({
@@ -298,10 +283,13 @@ export const getReportsByUserId = [
         data: reports,
       });
     } catch (err) {
-      console.error("Error in getReportsByUserId:", err.message, err.stack);
+      console.error("🔥 FATAL ERROR:", err.message);
+      console.error("🔥 STACK TRACE:", err.stack);
+
       return res.status(500).json({
         status: 500,
-        message: "Kesalahan server internal",
+        message: err.message,
+        stack: err.stack,
       });
     }
   },
