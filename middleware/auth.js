@@ -13,8 +13,10 @@ export const verifyToken = (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded; // Simpan payload ke dalam `req.user` untuk digunakan di fungsi lain
+    console.log("✅ Token verified, user:", decoded);
     next();
   } catch (error) {
+    console.error("❌ JWT error:", error.message);
     res.status(403).json({
       status: 403,
       message: "Invalid or expired token.",
