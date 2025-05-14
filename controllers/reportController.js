@@ -2,6 +2,7 @@ import Reports from "../models/Report.js";
 import { verifyToken } from "../middleware/auth.js";
 import multer from "multer";
 import { storage } from "../cloudinaryConfig.js";
+import mongoose from "mongoose";
 
 const kategoriList = ["Infrastruktur", "Lingkungan", "Kesehatan", "Pendidikan", "Layanan Publik", "Sosial, Lainnya"];
 const upload = multer({ storage });
