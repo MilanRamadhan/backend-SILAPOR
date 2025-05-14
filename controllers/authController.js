@@ -120,9 +120,15 @@ export const updateUser = [
   verifyToken,
   async (req, res) => {
     try {
-      const id = req.user.id;
-
+      const { id } = req.params;
       const { newFullName, newNomorInduk, newEmail, newCallNumber, newAddress, newPassword } = req.body;
+
+      if (!id) {
+        return res.status(400).json({
+          status: 400,
+          message: "ID Pengguna diperlukan, tetapi tidak disediakan",
+        });
+      }
 
       if (!newFullName || !newEmail) {
         return res.status(400).json({
