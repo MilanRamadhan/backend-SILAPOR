@@ -1,9 +1,10 @@
-import mongoose from "mongoose";
+import mongoose, { mongo } from "mongoose";
 
 const Reports = new mongoose.Schema(
   {
     reporterID: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "auths",
       required: true,
     },
     title: {
