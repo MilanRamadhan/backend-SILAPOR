@@ -256,34 +256,7 @@ export const getReportsByUserId = [
         });
       }
 
-      const reports = await Reports.aggregate([
-        {
-          $match: { reporterID: new mongoose.Types.ObjectId(id) },
-        },
-        {
-          $lookup: {
-            from: "auths",
-            localField: "reporterID",
-            foreignField: "_id",
-            as: "auths",
-          },
-        },
-        { $unwind: "$auths" },
-        {
-          $project: {
-            title: 1,
-            description: 1,
-            category: 1,
-            status: 1,
-            createdAt: 1,
-            auths: {
-              _id: "$auths._id",
-              name: "$auths.name",
-              email: "$auths.email",
-            },
-          },
-        },
-      ]);
+      const reports = await Reports.find({ reporterID: id });
 
       if (!reports.length) {
         return res.status(404).json({
