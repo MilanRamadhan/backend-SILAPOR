@@ -164,10 +164,10 @@ export const approveReport = [
   verifyToken,
   async (req, res) => {
     try {
-      const { reporterID } = req.params;
+      const { reportID } = req.params;
       const { response } = req.body;
 
-      const report = await Reports.findByIdAndUpdate(reporterID, { status: "approved", response }, { new: true });
+      const report = await Reports.findByIdAndUpdate(reportID, { status: "approved", response }, { new: true });
       if (!report) return res.status(404).json({ message: "Laporan tidak ditemukan" });
 
       res.json({ message: "Laporan disetujui", report });
@@ -184,10 +184,10 @@ export const rejectReport = [
   verifyToken,
   async (req, res) => {
     try {
-      const { reporterID } = req.params;
+      const { reportID } = req.params;
       const { response } = req.body;
 
-      const report = await Reports.findByIdAndUpdate(reporterID, { status: "rejected", response }, { new: true });
+      const report = await Reports.findByIdAndUpdate(reportID, { status: "rejected", response }, { new: true });
       if (!report) return res.status(404).json({ message: "Laporan tidak ditemukan" });
 
       res.json({ message: "Laporan ditolak", report });
