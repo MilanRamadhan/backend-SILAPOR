@@ -1,7 +1,7 @@
 import Auth from "../models/Auth.js";
+import { verifyToken } from "../middleware/auth.js";
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { verifyToken } from "../middleware/auth.js";
 
 const kecamatanList = ["Baiturrahman", "Banda Raya", "Jaya Baru", "Kuta Alam", "Kuta Raja", "Lueng Bata", "Meuraxa", "Syiah Kuala", "Ulee Kareng"];
 
