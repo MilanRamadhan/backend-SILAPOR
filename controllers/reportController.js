@@ -280,7 +280,7 @@ export const getReportsByUserId = [
             images: 10,
             auths: {
               _id: "$auths._id",
-              name: "$auths.name",
+              name: "$auths.fullName",
               email: "$auths.email",
             },
           },
@@ -340,7 +340,7 @@ export const getOtherUsersReports = [
             images: 10,
             auths: {
               _id: "$auths._id",
-              name: "$auths.name",
+              name: "$auths.fullName",
               email: "$auths.email",
             },
           },
