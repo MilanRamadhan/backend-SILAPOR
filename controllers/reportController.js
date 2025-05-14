@@ -249,6 +249,12 @@ export const getReportsByUserId = [
           message: "ID Pengguna diperlukan, tetapi tidak disediakan",
         });
       }
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({
+          status: 400,
+          message: "ID pengguna tidak valid",
+        });
+      }
 
       const reports = await Reports.aggregate([
         {
