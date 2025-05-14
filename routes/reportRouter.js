@@ -4,8 +4,8 @@ import { createReport, approveReport, rejectReport, editReport, getAllReports, g
 const router = express.Router();
 
 router.post("/createReport", createReport);
-router.put("/approve/:reportID", approveReport);
-router.put("/reject/:reportID", rejectReport);
+router.put("/approveReport/:reportID", approveReport);
+router.put("/rejectReport/:reportID", rejectReport);
 router.get("/getAllReports", getAllReports);
 router.get("/getByReporterID/:reporterID", getByReporterID);
 router.get("/getOtherUsersReports", getOtherUsersReports);
