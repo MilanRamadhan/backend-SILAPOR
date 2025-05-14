@@ -337,6 +337,7 @@ export const getOtherUsersReports = [
             category: 1,
             status: 1,
             createdAt: 1,
+            images: 10,
             auths: {
               _id: "$auths._id",
               name: "$auths.name",
