@@ -1,12 +1,12 @@
 import express from "express";
-import { register, login, updateUser, updatePassword, changeProfilePhoto, getAllUsers, logout } from "../controllers/authController.js";
+import { register, login, editProfile, changePassword, changeProfilePhoto, getAllUsers, logout } from "../controllers/authController.js";
 
 const authRouter = express.Router();
 authRouter.post("/register", register);
 authRouter.post("/login", login);
 authRouter.post("/logout", logout);
-authRouter.put("/updateUser/:id", updateUser);
-authRouter.post("/updatePassword/:id", updatePassword);
+authRouter.put("/editProfile/:id", editProfile);
+authRouter.post("/changePassword/:id", changePassword);
 authRouter.get("/getAllUsers", getAllUsers);
 authRouter.put("/changeProfilePhoto", changeProfilePhoto);
 

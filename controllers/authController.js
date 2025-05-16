@@ -116,12 +116,12 @@ export const login = async (req, res) => {
   }
 };
 
-export const updateUser = [
+export const editProfile = [
   verifyToken,
   async (req, res) => {
     try {
       const { id } = req.params;
-      const { newFullName, newNomorInduk, newEmail, newCallNumber, newAddress, newPassword } = req.body;
+      const { newFullName, newEmail } = req.body;
 
       if (!id) {
         return res.status(400).json({
@@ -168,11 +168,7 @@ export const updateUser = [
       }
 
       editedUser.fullName = newFullName;
-      editedUser.nomorInduk = newNomorInduk;
       editedUser.email = newEmail;
-      editedUser.callNumber = newCallNumber ?? editedUser.callNumber;
-      editedUser.address = newAddress ?? editedUser.address;
-      editedUser.password = newPassword ?? editedUser.password;
 
       await editedUser.save();
 
@@ -190,7 +186,7 @@ export const updateUser = [
   },
 ];
 
-export const updatePassword = [
+export const changePassword = [
   verifyToken,
   async (req, res) => {
     try {
