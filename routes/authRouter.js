@@ -6,7 +6,7 @@ authRouter.post("/register", register);
 authRouter.post("/login", login);
 authRouter.post("/logout", logout);
 authRouter.put("/editProfile/:id", editProfile);
-authRouter.post("/changePassword/:id", changePassword);
+authRouter.put("/changePassword/:id", changePassword);
 authRouter.get("/getAllUsers", getAllUsers);
 authRouter.put("/changeProfilePhoto", changeProfilePhoto);
 
