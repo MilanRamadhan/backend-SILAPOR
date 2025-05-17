@@ -140,21 +140,11 @@ export const editProfile = [
       const emailAlreadyRegistered = await Auth.findOne({
         email: newEmail,
       });
-      const nameAlreadyRegistered = await Auth.findOne({
-        fullName: newFullName,
-      });
 
       if (emailAlreadyRegistered) {
         return res.status(400).json({
           status: 400,
           message: "Email sudah digunakan",
-        });
-      }
-
-      if (nameAlreadyRegistered) {
-        return res.status(400).json({
-          status: 400,
-          message: "Nama sudah digunakan",
         });
       }
 
@@ -203,6 +193,17 @@ export const changePassword = [
         return res.status(400).json({
           status: 400,
           message: "Kata sandi baru diperlukan, tetapi tidak disediakan",
+        });
+      }
+
+      const passwordAlreadyRegistered = await Auth.findOne({
+        password: newPassword,
+      });
+
+      if (passwordAlreadyRegistered) {
+        return res.status(400).json({
+          status: 400,
+          message: "Kata sandi baru tidak boleh sama dengan kata sandi lama",
         });
       }
 
