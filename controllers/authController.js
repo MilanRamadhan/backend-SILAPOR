@@ -196,23 +196,20 @@ export const changePassword = [
         });
       }
 
-      const passwordAlreadyRegistered = await Auth.findOne({
-        password: newPassword,
-      });
-
-      if (passwordAlreadyRegistered) {
-        return res.status(400).json({
-          status: 400,
-          message: "Kata sandi baru tidak boleh sama dengan kata sandi lama",
-        });
-      }
-
       const user = await Auth.findById(id);
 
       if (!user) {
         return res.status(404).json({
           status: 404,
           message: "Pengguna Tidak Ditemukan",
+        });
+      }
+
+      const isSamePassword = await bcryptjs.compare(newPassword, user.password);
+      if (isSamePassword) {
+        return res.status(400).json({
+          status: 400,
+          message: "Kata sandi baru tidak boleh sama dengan kata sandi lama",
         });
       }
 
